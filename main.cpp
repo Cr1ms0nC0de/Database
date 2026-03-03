@@ -1,14 +1,15 @@
+#include <fstream>
 #include <string>
 using namespace std;
 
 #define maxEntries 100000
 
-struct Entry {
+struct Entry{
     string key;
     string value;
 };
 
-Entry store[maxEntries];
+Entry store[maxEntries]; //aray for storing entries
 int storeSize = 0;
 
 //find key
@@ -42,6 +43,34 @@ string getKey(string key){
     return "";
 }
 
+//load database
+void loadDatabase(){
+    ifstream file("data.db");
+    if(!file.is_open()){
+        return; //no file yet
+    }
+    string command, key, value;
+    while(file >> command >> key){ //read command and key
+        getline(file, value);
+        if(!value.empty() && value[0] == ' '){
+            value = value.substr(1); //get rid of the space between command and other inputs
+        }
+        if(command == "SET"){
+            setKey(key, value);
+        }
+    }
+    file.close();
+}
+
+//save to database
+void saveToDatabase(string key, string value){
+    ofstream file;
+    file.open("data.db", ios::app); //ios:app is for appending
+    if(file.is_open()){
+        file << "SET " << key << " " << value << "\n";
+        file.close();
+    }
+}
 
 int main(){
     //Nothing here yet
