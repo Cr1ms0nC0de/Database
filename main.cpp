@@ -73,8 +73,8 @@ void saveToDatabase(string key, string value){
     }
 }
 
-//command handler
-void handleCommand(string command, string key, string value){
+//execute command
+void executeCommand(string command, string key, string value){
     if(command == "SET"){
         setKey(key, value);
         saveToDatabase(key, value);
@@ -96,6 +96,25 @@ void handleCommand(string command, string key, string value){
 }
 
 int main(){
-    //Nothing here yet
+    loadDatabase();
+
+    string command, key, value;
+    while(cin >> command){ //while still running commands
+        if(command == "SET"){
+            cin >> key;
+            getline(cin, value);
+            if(!value.empty() && value[0] == ' '){ //if proper formating for command
+                value = value.substr(1); //get rid of the space between command and other inputs
+            }
+        }
+        else if(command == "GET"){
+            cin >> key;
+            value = "";
+        }
+        else if(command == "EXIT"){
+            exit(0);
+        }
+        executeCommand(command, key, value);
+    }
     return 0;
 }
