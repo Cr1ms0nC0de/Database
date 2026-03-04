@@ -34,11 +34,14 @@ void setKey(string key, string value){
         store[storeSize].value = value;
         storeSize++;
     }
+    cout << value << "\n";
 }
+
 //get key
 string getKey(string key){
     int pos = findKey(key);
     if(pos != -1){
+        cout << store[pos].value << "\n";
         return store[pos].value;
     }
     return "";
@@ -51,11 +54,7 @@ void loadDatabase(){
         return; //no file yet
     }
     string command, key, value;
-    while(file >> command >> key){ //read command and key
-        getline(file, value);
-        if(!value.empty() && value[0] == ' '){
-            value = value.substr(1); //get rid of the space between command and other inputs
-        }
+    while(file >> command >> key >> value){
         if(command == "SET"){
             setKey(key, value);
         }
@@ -63,7 +62,7 @@ void loadDatabase(){
     file.close();
 }
 
-//save to database
+//save database
 void saveToDatabase(string key, string value){
     ofstream file;
     file.open("data.db", ios::app); //ios:app is for appending
@@ -72,22 +71,26 @@ void saveToDatabase(string key, string value){
         file.close();
     }
 }
+void saveDatabase(){
+    ofstream file("data.db");
+    if(file.is_open()){
+        for(int i = 0; i < storeSize; i++){
+            file << "SET " << store[i].key << " " << store[i].value << "\n";
+        }
+        file.close();
+    }
+}
 
 //execute command
 void executeCommand(string command, string key, string value){
     if(command == "SET"){
         setKey(key, value);
-        saveToDatabase(key, value);
-        cout << "OK\n"; //I need to see what gradebot uses, I just put it to OK for now
+        //saveToDatabase(key, value);
+        saveDatabase();
     }
     else if(command == "GET"){
         string result = getKey(key);
-        if(result.empty()){
-            cout << "NULL\n"; //same as OK
-        }
-        else{
-            cout << result << "\n";
-        }
+        cout << result << "\n";
     }
     else if(command == "EXIT"){
         exit(0);
@@ -101,11 +104,7 @@ int main(){
     string command, key, value;
     while(cin >> command){ //while still running commands
         if(command == "SET"){
-            cin >> key;
-            getline(cin, value);
-            if(!value.empty() && value[0] == ' '){ //if proper formating for command
-                value = value.substr(1); //get rid of the space between command and other inputs
-            }
+            cin >> key >> value;
         }
         else if(command == "GET"){
             cin >> key;
